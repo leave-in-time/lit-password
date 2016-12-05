@@ -2,9 +2,13 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	ofDisableArbTex();
 	ofSetEscapeQuitsApp(false);
+#ifdef TARGET_OPENGLES
+	crtShader.load("crtES/shader");
+#else
+	ofDisableArbTex();
 	crtShader.load("crt/shader");
+#endif
 	fbo.allocate(ofGetWidth(), ofGetHeight());
 	passwordBuffer = "";
 	found = false;
@@ -122,11 +126,19 @@ void ofApp::drawCursor(){
 		shouldDrawCursor = !shouldDrawCursor;
 		timeElapsed = currentTime;
 	}
-	if (shouldDrawCursor) ofDrawRectangle(getBitmapStringBoundingBox(passwordBuffer).getWidth() + 8 + 2, 2*(LINE_HEIGHT) + attempts.size()*2*(LINE_HEIGHT) + LINE_HEIGHT + LINE_OFFSET, 8, FONT_HEIGHT);
+	if (shouldDrawCursor) {
+		ofDrawRectangle(
+			getBitmapStringBoundingBox(passwordBuffer).getWidth() + 8 + 2,
+			2*(LINE_HEIGHT) + attempts.size()*2*(LINE_HEIGHT) + LINE_HEIGHT + LINE_OFFSET,
+			8,
+			FONT_HEIGHT
+		);
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
+	ofLog(OF_LOG_NOTICE, ofToString(key));
 	// if we didn't hit return, add the key to our string
 	if (key != OF_KEY_RETURN) {
 		// some trickery: ignore the backspace key

@@ -6,7 +6,7 @@ endif
 
 # make sure the the OF_ROOT location is defined
 ifndef OF_ROOT
-    OF_ROOT=$(realpath ../../info/of_v0.9.7_linux64_release)
+    OF_ROOT=../of_v0.9.8_linuxarmv6l_release
 endif
 
 # call the project makefile!
