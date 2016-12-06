@@ -22,10 +22,17 @@ git clone https://github.com/xseignard/lit-password.git
 
 ## Overclock RPi
 
-Copy `misc/config.txt` to `/boot/config.txt`
+Set 256mb to the GPU memory via `sudo raspi-config`
 
+## Modifiy `ofAppEGLWindow`
+
+Add the following in `ofAppEGLWindow::readNativeKeyboardEvents`.
 ```
-sudo cp misc/config.txt /boot/config.txt
+case KEY_ENTER:
+case KEY_KPENTER:
+	pushKeyEvent = true;
+	keyEvent.key = OF_KEY_RETURN;
+	break;
 ```
 
 ## Compile and run it

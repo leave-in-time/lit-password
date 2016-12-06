@@ -223,6 +223,7 @@ bool ofApp::isSpecialChar(int key) {
 	}
 }
 
+//--------------------------------------------------------------
 int ofApp::getLocaleKey(int key) {
 	switch (key) {
 		// 1 to 0 with shift
