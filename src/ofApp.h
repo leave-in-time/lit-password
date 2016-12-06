@@ -1,6 +1,8 @@
 #pragma once
 
 #include "ofMain.h"
+#include "wiringPi.h"
+#include <signal.h>
 
 #define FONT_HEIGHT 12
 #define LINE_OFFSET 6
@@ -16,12 +18,14 @@ class ofApp : public ofBaseApp{
 
 	public:
 		void setup();
-		// void setupGPIOs();
+		void setupGPIOs();
 		void update();
 		void draw();
 
 		void keyPressed(int key);
 		bool isSpecialChar(int key);
+		int getLocaleKey(int key);
+		static void sighandler(int signal);
 
 		void drawHeader();
 		void drawAttempts();

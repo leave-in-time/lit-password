@@ -3,18 +3,17 @@
 
 //========================================================================
 int main() {
-	int width = 800;
-	int height = 600;
 #ifdef TARGET_OPENGLES
 	ofGLESWindowSettings settings;
-	settings.width = width;
-	settings.height = height;
+	settings.width = 1920;
+	settings.height = 1080;
+	settings.windowMode = OF_WINDOW;
 	settings.setGLESVersion(2);
 	ofCreateWindow(settings);
 #else
 	ofGLWindowSettings settings;
-	settings.width = width;
-	settings.height = height;
+	settings.width = 800;
+	settings.height = 600;
 	settings.setGLVersion(3,2);
 	ofCreateWindow(settings);
 #endif

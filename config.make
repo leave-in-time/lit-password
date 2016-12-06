@@ -1,1 +1,1 @@
-#PROJECT_LDFLAGS = -lwiringPi
+PROJECT_LDFLAGS = -lwiringPi

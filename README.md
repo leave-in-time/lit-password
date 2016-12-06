@@ -53,3 +53,31 @@ sudo update-rc.d lit-password defaults
 ```
 
 This will make the app run at startup
+
+## Disable shortcuts (ctrl-alt-del, tty)
+
+### ctrl-alt-del
+
+```
+sudo rm /lib/systemd/system/ctrl-alt-del.target
+sudo ln -s /dev/null /lib/systemd/system/ctrl-alt-del.target
+sudo systemctl daemon-reload
+```
+
+### tty
+
+```
+sudo nano /etc/systemd/logind.conf
+```
+
+Then use the following:
+
+```
+[Login]
+NAutoVTs=1
+ReserveVT=0
+```
+
+### alt-f4
+
+TODO?
