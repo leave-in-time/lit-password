@@ -160,7 +160,7 @@ void ofApp::keyPressed(int key) {
 		attempt currentAttempt;
 		currentAttempt.password = passwordBuffer;
 		if (passwordBuffer == "resetTheMatrix") shouldReset = true;
-		else if (passwordBuffer == "toto") {
+		else if (passwordBuffer == "NNHLRCRB") {
 			found = true;
 			currentAttempt.found = true;
 		}
