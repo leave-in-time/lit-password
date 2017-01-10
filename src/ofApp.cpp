@@ -17,6 +17,7 @@ void ofApp::setup(){
 	shouldReset = false;
 	// sounds
 	vroum.load("sounds/vroum.wav");
+	vroum.setLoop(true);
 	stop.load("sounds/stop.wav");
 	// gpio setup
 	setupGPIOs();
@@ -55,7 +56,6 @@ void ofApp::update(){
 		found = false;
 		digitalWrite(RELAY_PIN, LOW);
 		ofLog(OF_LOG_NOTICE, "Relay off");
-		vroum.setLoop(true);
 		vroum.play();
 	}
 	// reset the program
@@ -90,7 +90,7 @@ void ofApp::draw(){
 	drawCursor();
 	fbo.end();
 	crtShader.begin();
-	crtShader.setUniform1f("currentTime", ofGetElapsedTimeMillis());
+	crtShader.setUniform1f("currentTime", ofGetElapsedTimef());
 	crtShader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
 	fbo.draw(0, 0);
 	crtShader.end();
