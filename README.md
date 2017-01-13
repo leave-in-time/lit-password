@@ -61,6 +61,14 @@ sudo update-rc.d lit-password defaults
 
 This will make the app run at startup
 
+## More sound
+
+Add the following to `/etc/rc.local`:
+
+```
+amixer set PCM,0 90%
+```
+
 ## Disable shortcuts (ctrl-alt-del, tty)
 
 ### ctrl-alt-del
