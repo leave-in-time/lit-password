@@ -131,8 +131,8 @@ void ofApp::drawHeader(){
 //--------------------------------------------------------------
 void ofApp::drawAttempts(){
 	int offset = 10*(LINE_HEIGHT);
-	// only handle the last 13 attempts in order to fit the GUI
-	if (attempts.size() > 9) attempts.erase(attempts.begin());
+	// only handle the last 14 attempts in order to fit the GUI
+	if (attempts.size() > 14) attempts.erase(attempts.begin());
 	// draw the last 13 or less attempts
 	for (int i = 0; i < attempts.size(); i++){
 		offset += LINE_HEIGHT;
