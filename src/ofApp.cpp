@@ -6,21 +6,25 @@ void ofApp::setup(){
 	ofHideCursor();
 #ifdef TARGET_OPENGLES
 	crtShader.load("crtES/shader");
+	// gpio setup
+	setupGPIOs();
 #else
 	ofDisableArbTex();
 	crtShader.load("crt/shader");
 #endif
 	fbo.allocate(ofGetWidth(), ofGetHeight());
 	passwordBuffer = "";
+	int headerWidth = getBitmapStringBoundingBox(STARS).getWidth();
+	headerOffset = (ofGetWidth() - headerWidth) / 2;
+	promptOffset = ofGetWidth() / 10;
 	found = false;
 	shouldDrawCursor = true;
+	shouldDrawHeader = true;
 	shouldReset = false;
 	// sounds
 	vroum.load("sounds/vroum.wav");
 	vroum.setLoop(true);
 	stop.load("sounds/stop.wav");
-	// gpio setup
-	setupGPIOs();
 	// prevent SIGINT, SIGTERM and SIGKILL
 	// signal(SIGINT, &ofApp::sighandler);
 	// signal(SIGTERM, &ofApp::sighandler);
@@ -28,6 +32,7 @@ void ofApp::setup(){
 }
 
 //--------------------------------------------------------------
+#ifdef TARGET_OPENGLES
 void ofApp::setupGPIOs(){
 	previousButtonState = true;
 	currentButtonState = true;
@@ -42,6 +47,7 @@ void ofApp::setupGPIOs(){
 	pinMode(BUTTON_PIN, INPUT);
 	pullUpDnControl(BUTTON_PIN, PUD_UP);
 }
+#endif
 
 //--------------------------------------------------------------
 void ofApp::sighandler(int signal) {
@@ -54,7 +60,9 @@ void ofApp::update(){
 	// deactivate the relay if password is found
 	if (found) {
 		found = false;
+		#ifdef TARGET_OPENGLES
 		digitalWrite(RELAY_PIN, LOW);
+		#endif
 		ofLog(OF_LOG_NOTICE, "Relay off");
 		vroum.play();
 	}
@@ -62,13 +70,17 @@ void ofApp::update(){
 	if (shouldReset) {
 		shouldReset = false;
 		found = false;
+		#ifdef TARGET_OPENGLES
 		digitalWrite(RELAY_PIN, HIGH);
+		#endif
 		ofLog(OF_LOG_NOTICE, "Relay on");
 		attempts.clear();
 		vroum.stop();
 		stop.play();
 	}
+	#ifdef TARGET_OPENGLES
 	currentButtonState = digitalRead(BUTTON_PIN);
+	#endif
 	// button is on
 	if (currentButtonState != previousButtonState && !currentButtonState) {
 		shouldReset = true;
@@ -83,7 +95,7 @@ void ofApp::draw(){
 	ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
 	fbo.end();
 	fbo.begin();
-	ofSetColor(50, 50, 255);
+	ofSetColor(255, 255, 255);
 	drawHeader();
 	drawAttempts();
 	drawBuffer();
@@ -98,49 +110,62 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::drawHeader(){
-	ofDrawBitmapString("***********************************", 0, LINE_HEIGHT);
-	ofDrawBitmapString("* Veuillez entrer le mot de passe *", 0, 2*(LINE_HEIGHT));
-	ofDrawBitmapString("***********************************", 0, 3*(LINE_HEIGHT));
+	int currentTime = ofGetElapsedTimeMillis();
+	if (currentTime - headerElapsed > INTERVAL / 2) {
+		shouldDrawHeader = !shouldDrawHeader;
+		headerElapsed = currentTime;
+	}
+	if (shouldDrawHeader) {
+		ofSetColor(255, 50, 50);
+		ofDrawBitmapString(STARS, headerOffset, 4*LINE_HEIGHT);
+		ofDrawBitmapString(EMPTY_STARS, headerOffset, 5*(LINE_HEIGHT));
+		ofDrawBitmapString(DANGER, headerOffset, 6*(LINE_HEIGHT));
+		ofDrawBitmapString(ALERT, headerOffset, 7*(LINE_HEIGHT));
+		ofDrawBitmapString(EMPTY_STARS, headerOffset, 8*(LINE_HEIGHT));
+		ofDrawBitmapString(STARS, headerOffset, 9*(LINE_HEIGHT));
+		ofSetColor(255, 255, 255);
+	}
+	ofDrawBitmapString(INCENTIVE, headerOffset - 8, 10*(LINE_HEIGHT));
 }
 
 //--------------------------------------------------------------
 void ofApp::drawAttempts(){
-	int offset = 3*(LINE_HEIGHT);
+	int offset = 10*(LINE_HEIGHT);
 	// only handle the last 13 attempts in order to fit the GUI
-	if (attempts.size() > 14) attempts.erase(attempts.begin());
+	if (attempts.size() > 9) attempts.erase(attempts.begin());
 	// draw the last 13 or less attempts
 	for (int i = 0; i < attempts.size(); i++){
 		offset += LINE_HEIGHT;
-		ofDrawBitmapString(">" + attempts[i].password, 0, offset);
+		ofDrawBitmapString(">" + attempts[i].password, promptOffset, offset);
 		offset += LINE_HEIGHT;
 		if (attempts[i].found) {
 			ofSetColor(50, 255, 50);
-			ofDrawBitmapString("/!\\ Mot de passe OK, deverouillage /!\\", 0, offset);
+			ofDrawBitmapString(OK, promptOffset, offset);
 		}
 		else {
 			ofSetColor(255, 50, 50);
-			ofDrawBitmapString("/!\\ Erreur systeme /!\\", 0, offset);
+			ofDrawBitmapString(KO, promptOffset, offset);
 		}
-		ofSetColor(50, 50, 255);
+		ofSetColor(255, 255, 255);
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::drawBuffer(){
-	ofDrawBitmapString(">" + passwordBuffer, 0, 3*(LINE_HEIGHT) + attempts.size()*2*(LINE_HEIGHT) + LINE_HEIGHT);
+	ofDrawBitmapString(">" + passwordBuffer, promptOffset, 10*(LINE_HEIGHT) + attempts.size()*2*(LINE_HEIGHT) + LINE_HEIGHT);
 }
 
 //--------------------------------------------------------------
 void ofApp::drawCursor(){
 	int currentTime = ofGetElapsedTimeMillis();
-	if (currentTime - timeElapsed > INTERVAL) {
+	if (currentTime - cursorElapsed > INTERVAL) {
 		shouldDrawCursor = !shouldDrawCursor;
-		timeElapsed = currentTime;
+		cursorElapsed = currentTime;
 	}
 	if (shouldDrawCursor) {
 		ofDrawRectangle(
-			getBitmapStringBoundingBox(passwordBuffer).getWidth() + 8 + 2,
-			2*(LINE_HEIGHT) + attempts.size()*2*(LINE_HEIGHT) + LINE_HEIGHT + LINE_OFFSET,
+			getBitmapStringBoundingBox(passwordBuffer).getWidth() + 8 + 2 + promptOffset,
+			9*(LINE_HEIGHT) + attempts.size()*2*(LINE_HEIGHT) + LINE_HEIGHT + LINE_OFFSET,
 			8,
 			FONT_HEIGHT
 		);
@@ -160,7 +185,7 @@ void ofApp::keyPressed(int key) {
 		attempt currentAttempt;
 		currentAttempt.password = passwordBuffer;
 		if (passwordBuffer == "resetTheMatrix") shouldReset = true;
-		else if (passwordBuffer == "NNHLRCRB") {
+		else if (passwordBuffer == "NNHLRCRB" || passwordBuffer == "nnhlrcrb") {
 			found = true;
 			currentAttempt.found = true;
 		}
