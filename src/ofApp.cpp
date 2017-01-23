@@ -29,6 +29,9 @@ void ofApp::setup(){
 	// signal(SIGINT, &ofApp::sighandler);
 	// signal(SIGTERM, &ofApp::sighandler);
 	// signal(SIGKILL, &ofApp::sighandler);
+	// password init
+	ofBuffer buff = ofBufferFromFile("/boot/password.txt");
+	password = trim(buff.getText());
 }
 
 //--------------------------------------------------------------
@@ -185,7 +188,7 @@ void ofApp::keyPressed(int key) {
 		attempt currentAttempt;
 		currentAttempt.password = passwordBuffer;
 		if (passwordBuffer == "resetTheMatrix") shouldReset = true;
-		else if (passwordBuffer == "NNHLRCRB" || passwordBuffer == "nnhlrcrb") {
+		else if (toLower(passwordBuffer) == password) {
 			found = true;
 			currentAttempt.found = true;
 		}
