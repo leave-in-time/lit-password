@@ -5,6 +5,9 @@
 #include "wiringPi.h"
 #endif
 #include <signal.h>
+#include <Poco/String.h>
+using Poco::trim;
+using Poco::toLower;
 
 #define FONT_HEIGHT 12
 #define LINE_OFFSET 6
@@ -49,6 +52,7 @@ class ofApp : public ofBaseApp{
 		ofFbo fbo;
 
 		vector<attempt> attempts;
+		string password;
 		string passwordBuffer;
 		int headerOffset;
 		int promptOffset;
